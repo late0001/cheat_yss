@@ -4,21 +4,27 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.PixelFormat;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class SmallWindowsView extends FrameLayout {
 
@@ -53,11 +59,13 @@ public class SmallWindowsView extends FrameLayout {
         //可以根据你的实际情况在这个FrameLayout里添加界面控件之类的，
         // 我之前是用的实时音视频，把相关业务代码去掉了，直接放一个图标
         // 实际上就是拿到一个View从WindowManager给addView进去
-        ImageView imageView = new ImageView(getContext());
+        //ImageView imageView = new ImageView(getContext());
         //imageView.setImageResource(R.mipmap.ic_launcher);
+        InputStream hsm =null;
+        Bitmap bitmap = null;
         try {
-            InputStream hsm = ActContext.getAssets().open("image/hesuanma.jpg");
-            Bitmap bitmap = BitmapFactory.decodeStream(hsm);
+            hsm = ActContext.getAssets().open("image/hesuanma222.png");
+            bitmap = BitmapFactory.decodeStream(hsm);
             viewWidth = bitmap.getWidth();
             viewHeight = bitmap.getHeight();
             String str = " viewWidth= " + viewWidth + ", viewHeight=" + viewHeight;
@@ -66,13 +74,25 @@ public class SmallWindowsView extends FrameLayout {
         }catch(IOException ex){
             ex.printStackTrace();
         }
-        Drawable drawb = getResources().getDrawable(R.drawable.hesuanma);
-        imageView.setImageDrawable(drawb);
-        //TextView txtView = new TextView(getContext());
-        //txtView.setText("hello world");
+        //Drawable drawb = getResources().getDrawable(R.drawable.hesuanma);
+        //imageView.setImageDrawable(drawb);
+        if(hsm == null) Log.d("hello", "Not find png");
+        Drawable drable = new BitmapDrawable(bitmap);
+        View fl_view = LayoutInflater.from(getContext()).inflate(R.layout.float_layout, null);
+        LinearLayout layout = fl_view.findViewById(R.id.flayout);
+        if(layout == null) {
+            Log.d("hello", "layout is null!!!");
+            return;
+        }else {
+            layout.setBackground(drable);
+        }
+        TextView tv_date = fl_view.findViewById(R.id.tvDate) ;
+        SimpleDateFormat dFormat=new SimpleDateFormat("yyyy-MM-dd 06:52");
+        Date now=new Date();
+        tv_date.setText(dFormat.format(now));
         LayoutParams params = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT);
-        addView(imageView, params);
+        addView(fl_view, params);
     }
 
     //dp转px
